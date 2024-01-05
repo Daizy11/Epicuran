@@ -3,6 +3,7 @@ const prisma = new PrismaClient()
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -37,7 +38,6 @@ const createSendToken = (user, statusCode, res) => {
 exports.signup = catchAsync(async (req, res, next) => {
     try {
         const hashPassword = await bcrypt.hash(req.body.password, 10);
-
         const user = await prisma.user.create({
             data: {
                 name: req.body.name,
@@ -45,6 +45,7 @@ exports.signup = catchAsync(async (req, res, next) => {
                 password: hashPassword
             },
         });
+        // console.log(user.code)
 
         createSendToken(user, 201, res);
         res.status(201).json({
@@ -53,6 +54,8 @@ exports.signup = catchAsync(async (req, res, next) => {
         });
 
     } catch (error) {
+        next(new AppError("Email is Duplicate",400)) 
+        // console.error(error)
         res.status(500).json({ error });
     }
 
