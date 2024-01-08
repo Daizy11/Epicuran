@@ -11,6 +11,41 @@ const signToken = (id) => {
     });
 };
 
+exports.protect = catchAsync(async (req, res, next) => {
+    // to protect the id and use the JWT  
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+  
+    if (!token) {
+      return next(
+        new AppError("You are not log in, please log in to get access", 401)
+      );
+    }
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET); //seeing if the payload token has not been manipulated by some malicious third party
+  
+    const currentUser = await prisma.seller.findUnique({
+      where: {
+        id: decoded.id //id of user 
+      }
+    })
+    if (!currentUser) {
+      return next(
+        new AppError(
+          "The token belonging to this user does no longer exist",
+          401
+        )
+      );
+    }
+   
+    req.user = currentUser;
+    res.locals.user = currentUser;
+    next();
+  });
+
 const createSendToken = (user, statusCode, res) => {
     const token = signToken(user.id);
     const cookieOption = {
@@ -45,7 +80,6 @@ exports.signup = catchAsync(async (req, res, next) => {
                 password: hashPassword
             },
         });
-        // console.log(user.code)
 
         createSendToken(user, 201, res);
         res.status(201).json({

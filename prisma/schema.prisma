@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id                    Int       @id @default(autoincrement())  
+  id                    Int       @id @default(autoincrement()) @unique
   name                  String    @db.Text()  
   email                 String    @unique
   role                  Role?     @default(User)
@@ -18,6 +18,32 @@ model User {
   passwordResetToken    String? 
   passwordResetExpires  DateTime?
   passwordChangeAt      DateTime?
+  post                  Post[]
+  follower              Follower[]
+  following             Following[]
+
+}
+
+model Post {
+  id                    Int       @id @default(autoincrement())
+  content               String
+  user                  User      @relation(fields: [userId], references: [id])
+  userId                Int 
+  created_at            DateTime? @default(now())
+}
+
+model Follower {
+  id                    Int       @id @default(autoincrement())
+  follower              Int?
+  user                  User      @relation(fields: [userId], references: [id])
+  userId                Int 
+}
+
+model Following {
+  id                    Int       @id @default(autoincrement())
+  following             Int?
+  user                  User      @relation(fields: [userId], references: [id])
+  userId                Int 
 }
 
 enum Role {
