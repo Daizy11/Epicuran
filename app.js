@@ -1,8 +1,12 @@
 const express = require('express')
 const userRouter = require('./router/userRouter')
+const followingRouter = require('./router/followingRouter')
+const followerRouter = require('./router/followerRouter')
+const postRouter = require('./router/postRouter')
 const globalError = require('./controller/errorController')
 const cookieParser = require('cookie-parser');
 const cors = require('cors')
+const session = require('express-session')
 const app = express()
 
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -32,6 +36,11 @@ app.use(function(req, res, next) {
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.json({ limit: '10kb' }));
 app.use('/api/v1/user', userRouter)
+app.use('/api/v1/follower', followerRouter)
+app.use('/api/v1/following', followingRouter)
+app.use('/api/v1/post', postRouter)
+
+
 app.use(globalError)
 
 module.exports = app;

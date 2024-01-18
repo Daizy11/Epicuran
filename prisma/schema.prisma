@@ -21,7 +21,6 @@ model User {
   post                  Post[]
   follower              Follower[]
   following             Following[]
-
 }
 
 model Post {
