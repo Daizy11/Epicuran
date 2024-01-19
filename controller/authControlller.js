@@ -88,7 +88,8 @@ exports.signup = catchAsync(async (req, res, next) => {
         });
 
     } catch (error) {
-        next(new AppError("Email is Duplicate",400)) 
+      console.log(error)
+        // next(new AppError("Email is Duplicate",400)) 
         // console.error(error)
         res.status(500).json({ error });
     }
