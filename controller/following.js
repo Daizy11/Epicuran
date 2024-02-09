@@ -34,7 +34,7 @@ exports.getOneFollowing = catchAsync( async (req, res, next) => {
 
     const data = await prisma.following.findUnique({
         where: {
-            id: id
+            id: parseInt(id)
         }
     })
     res.status(200).json({

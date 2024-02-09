@@ -16,6 +16,7 @@ model User {
   password              String?   @db.Text()
   created_at            DateTime? @default(now())
   passwordResetToken    String? 
+  photo                 String?
   passwordResetExpires  DateTime?
   passwordChangeAt      DateTime?
   post                  Post[]

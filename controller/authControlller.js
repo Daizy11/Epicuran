@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { promisify } = require('util');
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -26,8 +27,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       );
     }
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET); //seeing if the payload token has not been manipulated by some malicious third party
-  
-    const currentUser = await prisma.seller.findUnique({
+    const currentUser = await prisma.user.findUnique({
       where: {
         id: decoded.id //id of user 
       }
@@ -40,7 +40,7 @@ exports.protect = catchAsync(async (req, res, next) => {
         )
       );
     }
-   
+   console.log(currentUser)
     req.user = currentUser;
     res.locals.user = currentUser;
     next();
@@ -89,8 +89,8 @@ exports.signup = catchAsync(async (req, res, next) => {
 
     } catch (error) {
       console.log(error)
-        // next(new AppError("Email is Duplicate",400)) 
-        // console.error(error)
+      //   next(new AppError("Email is Duplicate",400)) 
+        console.error(error)
         res.status(500).json({ error });
     }
 
